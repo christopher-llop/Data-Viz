@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Page Template</title>
+        <script type="text/javascript" src="d3/d3.min.js"></script>
+		<style>
+			.axis path,
+			.axis line {
+				fill: none;
+				stroke: black;
+				shape-rendering: crispEdges;
+			}
+			.axis text {
+				font-family: sans-serif;
+				font-size: 11px;
+			}
+		</style>
+    </head>
+    <body>
+        <script type="text/javascript">
+		var w = 800;
+		var h = 400;
+		var barPadding = 1;
+		var padding = 20;
+		
+		var dataset = [1, 1, 3, 9, 8, 6, 5, 11, 4, 2, 8, 10, 15, 19, 18, 8, 
+					   9, 8, 20, 25, 25, 7, 2, 2, 5, 10, 13, 27, 18, 6, 6, 16, 
+			           20, 21, 27, 18, 8, 4, 19, 11, 18, 20, 13, 7, 2]
+			
+		var yScale = d3.scale.linear()
+						.domain([0, d3.max(dataset, function(d) { return d; })])
+						.range([h - padding, padding])			  
+
+		var yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(5)
+						
+		var svg = d3.select("body").append("svg").attr("width",w).attr("height",h);
+		svg.selectAll("rect").data(dataset).enter().append("rect")
+			.attr({
+				x: function(d,i) { return padding + (i * ( (w - 2*padding) / dataset.length ))},
+				y: function(d) { return yScale(d)},
+				width: (w - 2*padding) / dataset.length - barPadding,
+				height: function(d) { return h - yScale(d) - padding},
+				fill: function(d,i) { 
+					if (i <= 31) { return 'teal' }
+						else { return 'green'}}
+			});
+						
+		svg.selectAll("text").data(dataset).enter().append("text")
+			.text(function(d) { return d })
+			.attr({
+				x: function(d,i) { return padding + i * ((w - 2*padding)  / dataset.length ) + ((w - 2*padding)  / dataset.length - barPadding) / 2 },
+				y: function(d) {  return yScale(d) + 12},
+				"font-family": "sans-serif",
+				"font-size": "11px",
+				fill: "white",
+				"text-anchor": "middle"
+			});
+
+		svg.append("g").attr("class", "axis")
+			.attr("transform", "translate("+ padding +",0)")
+			.call(yAxis)
+			
+		svg.append("text")
+			.text("Count of Emails Received Each Day in 2016")
+			.attr({
+				x: w/2,
+				y: padding/2 + 4,
+				"font-family": "sans-serif",
+				"font-size": "14px",
+				"text-anchor": "middle"
+			});
+			
+		svg.append("text")
+			.text("January")
+			.attr({
+				x: w/3 + 30,
+				y: h - padding/2 + 6,
+				"font-family": "sans-serif",
+				"font-size": "14px",
+				"text-anchor": "middle"
+			});
+		svg.append("text")
+			.text("February")
+			.attr({
+				x: 4*w/5 + 30,
+				y: h - padding/2 + 6,
+				"font-family": "sans-serif",
+				"font-size": "14px",
+				"text-anchor": "middle"
+			});
+
+		</script>
+    </body>
+</html>
