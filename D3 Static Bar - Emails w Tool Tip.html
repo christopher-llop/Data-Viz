@@ -15,12 +15,54 @@
 				font-family: sans-serif;
 				font-size: 11px;
 			}
+
+
+			rect:hover {
+				fill: gray;
+			}		
+			#tooltip {
+				position: absolute;
+				width: 180px;
+				padding: 10px;
+				height: auto;
+				background-color: orange;
+				border-radius: 10px;
+				pointer-events: none;
+			}
+			#tooltip.hidden {
+				display: none;
+			}
+			#tooltip p {
+				margin: 0;
+				font-family: sans-serif;
+				font-size: 16px;
+				line-height: 20px;
+			}
+
+			.togbutton {
+				position: absolute;
+				left: 75px;
+				top: 50px;
+				padding: 10px;
+				background-color: white;
+				border-radius: 10px;
+				border-style: solid;
+				cursor: pointer;
+				font-family: sans-serif;
+				font-size: 14px;
+			}
+
+
 		</style>
     </head>
     <body>
-		<p>
-			Click Here to Modify Graph
+		<p class="togbutton">
+			Click Here to Toggle Graph
 		</p>
+		<div id="tooltip" class="hidden">
+			<p><strong>Email Progress...</strong></p>
+			<p><span id="value">100</span></p>
+		</div>
         <script type="text/javascript">
 		// Parameters
 		var w = 900;
@@ -59,21 +101,32 @@
 					if (i <= 30) { return 'teal' }
 						else { return 'green'}}
 			})
-			.on("mouseover", function() {
-			        d3.select(this)
-			          .attr("fill", "orange");
-			})
-			.on("mouseout", function(d, i) {
-				if (i <= 30) { d3.select(this)
-					  .transition()
-					  .duration(50)
-			          .attr("fill", "teal") }
-					else { d3.select(this)
-					  .transition()
-					  .duration(50)
-			          .attr("fill", "green")}
-			});
-			
+			.on("mouseover", function(d, i) {
+				//Code adapted from http://chimera.labs.oreilly.com/books/1230000000345/ch10.html
+				//Under fair-use outlined in introductory chapter.
+				
+				// Set position for tool tip
+				var xtip = parseFloat(d3.select(this).attr("x"));
+				var ytip = parseFloat(d3.select(this).attr("y")) / 2 + h / 2;
+
+				//Create text for tool tip
+				unread = unreadmail[i]
+				read = allmail[i]
+				d3.select("#tooltip")
+					.style("left", xtip + "px")
+					.style("top", ytip + "px")						
+					.select("#value")
+					.text(read-unread + " of " + read + " messages read");
+
+				//Display the tip
+				d3.select("#tooltip").classed("hidden", false);
+
+		     })
+		   .on("mouseout", function() {
+				//Hide the tip
+				d3.select("#tooltip").classed("hidden", true);
+	
+		   });			
 						
 		svg.selectAll("text").data(allmail).enter().append("text")
 			.text(function(d) { return d })
@@ -160,7 +213,7 @@
 					// Set variables based on current state
 					if(state == "allmail") {
 						var thesedata = unreadmail;
-						var newTitle = "Number of Emails Never Read Each Day (2016)"
+						var newTitle = "Number of Unread Emails Each Day (2016)"
 						state = "unreadmail";
 					} else {
 						var thesedata = allmail;
